@@ -6,18 +6,23 @@
 # İş Problemi / Business Problem
 #############################################
 # Online ayakkabı mağazası olan FLO müşterilerini segmentlere ayırıp bu segmentlere göre pazarlama stratejileri
-# belirlemek istiyor.
+# belirlemek istiyor./ FLO, an online shoe store, wants to segment its customers and 
+# determine marketing strategies according to these segments.
+# 
 # Buna yönelik olarak müşterilerin davranışları tanımlanacak ve bu davranışlardaki öbeklenmelere göre gruplar
-# oluşturulacak.
+# oluşturulacak./ To this end, the behaviors of the customers will be defined and groups will be formed 
+# according to the clusters in these behaviors.
+
 
 #############################################
 # Veri Seti Hikayesi / Dataset Story
 #############################################
-# Veri seti Flo’dan son alışverişlerini 2020 - 2021 yıllarında OmniChannel (hem online hem offline alışveriş yapan)
-# olarak yapan müşterilerin geçmiş alışveriş davranışlarından elde edilen bilgilerden oluşmaktadır.
+# Veri seti Flo’dan son alışverişlerini 2020 - 2021 yıllarında OmniChannel (hem online hem offline alışverişeriş yapan)
+# olarak yapan müşterilerin geçmiş alışveriş davranışlarından elde edilen bilgilerden oluşmaktadır. / 
+# The dataset consists of the information obtained from the past shopping behaviors of customers 
+# who made their last purchases from Flo as OmniChannel (both online and offline shopping access) in the years 2020-2021.
 
-
-# 12 Değişken 19.945 Gözlem 2.7MB
+# 12 Değişken(Variable) 19.945 Gözlem(values) 2.7MB
 # Değişkenler / Variables
 #
 # master_id: Eşsiz müşteri numarası
