@@ -1,5 +1,5 @@
 #############################################
-# RFM Analizi ile Müşteri Segmentasyonu
+# RFM Analizi ile Müşteri Segmentasyonu/ customer Segmentation with RFM Analysis
 #############################################
 
 #############################################
