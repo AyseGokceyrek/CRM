@@ -170,7 +170,7 @@ flo_rfm.describe().T
 
 flo_rfm.shape
 ###############################################################
-# GÖREV 3. RF Skorunun Hesaplanması
+# GÖREV 3. RF Skorunun Hesaplanması / Calculating RF Score
 ###############################################################
 # Adım 1: Recency, Frequency ve Monetary metriklerini qcut yardımı ile 1-5 arasında skorlara çeviriniz.
 # Adım 2: Bu skorları recency_score, frequency_score ve monetary_score olarak kaydediniz.
@@ -188,7 +188,7 @@ flo_rfm["RFM_SCORE"] = (flo_rfm['Recency_score'].astype(str) +
                     flo_rfm['frequency_score'].astype(str))
 
 ###############################################################
-# GÖREV 4. RF Skorunun Segment Olarak Tanımlanması
+# GÖREV 4. RF Skorunun Segment Olarak Tanımlanması / Definition of RF Score as Segments
 ###############################################################
 # Adım 1: Oluşturulan RF skorları için segment tanımlamaları yapınız.
 # Adım 2: Aşağıdaki seg_map yardımı ile skorları segmentlere çeviriniz
@@ -234,24 +234,22 @@ flo_rfm[["segment", "recency", "frequency", "monetary"]].groupby("segment").agg(
 # Adım 2: RFM analizi yardımıyla aşağıda verilen 2 case için ilgili profildeki müşterileri bulun ve müşteri id'lerini
 # csv olarak kaydediniz.
 
-"""
-a. FLO bünyesine yeni bir kadın ayakkabı markası dahil ediyor. Dahil ettiği markanın ürün fiyatları genel müşteri
- tercihlerinin üstünde. Bu nedenle markanın tanıtımı ve ürün satışları için ilgilenecek profildeki müşterilerle özel olarak
- iletişime geçmek isteniliyor. Sadık müşterilerinden(champions, loyal_customers) ve kadın kategorisinden alışveriş
- yapan kişiler özel olarak iletişim kurulacak müşteriler. Bu müşterilerin id numaralarını csv dosyasına kaydediniz.
-"""
+# a. FLO bünyesine yeni bir kadın ayakkabı markası dahil ediyor. Dahil ettiği markanın ürün fiyatları genel müşteri
+# tercihlerinin üstünde. Bu nedenle markanın tanıtımı ve ürün satışları için ilgilenecek profildeki müşterilerle özel olarak
+# iletişime geçmek isteniliyor. Sadık müşterilerinden(champions, loyal_customers) ve kadın kategorisinden alışveriş
+# yapan kişiler özel olarak iletişim kurulacak müşteriler. Bu müşterilerin id numaralarını csv dosyasına kaydediniz.
+
 df.columns
 loyal_customer_ids = flo_rfm[flo_rfm["segment"].isin(["champions", "loyal_customers"])]["customerId"]
 female_cust_ids = df[(df["master_id"].isin(loyal_customer_ids)) & (df["interested_in_categories_12"].str.contains("KADIN"))]["master_id"]
 female_cust_ids.to_csv("new_brand_target_customers.csv", index=False)
 female_cust_ids.shape
 len(female_cust_ids)
-"""
-b. Erkek ve Çocuk ürünlerinde %40'a yakın indirim planlanmaktadır.
-    -Bu indirimle ilgili kategorilerle ilgilenen geçmişte iyi müşteri olan ama uzun süredir alışveriş yapmayan 
-        kaybedilmemesi gereken müşteriler, uykuda olanlar ve yeni gelen müşteriler özel olarak hedef alınmak isteniyor. 
-        Uygun profildeki müşterilerin id'lerini csv dosyasına kaydediniz.
-"""
+
+# b. Erkek ve Çocuk ürünlerinde %40'a yakın indirim planlanmaktadır.
+#Bu indirimle ilgili kategorilerle ilgilenen geçmişte iyi müşteri olan ama uzun süredir alışveriş yapmayan 
+# kaybedilmemesi gereken müşteriler, uykuda olanlar ve yeni gelen müşteriler özel olarak hedef alınmak isteniyor. 
+#Uygun profildeki müşterilerin id'lerini csv dosyasına kaydediniz.
 
 
 tar_seg_cust_ids = flo_rfm[flo_rfm["segment"].isin(["cant_loose", "hibernating","new_customers"])]["customerId"]
