@@ -134,7 +134,7 @@ data_prepare(df)
 df.dtypes
 
 ###############################################################
-# GÖREV 2. RFM Metriklerinin Hesaplanması
+# GÖREV 2. RFM Metriklerinin Hesaplanması / Calculating RFM Metrics
 ###############################################################
 # Adım 1: Recency, Frequency ve Monetary tanımlarını yapınız.
 
