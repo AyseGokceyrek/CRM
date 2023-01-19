@@ -13,8 +13,8 @@
 # Veri Seti Hikayesi / Dataset Story
 #############################################
 # Veri seti Flo’dan son alışverişlerini 2020 - 2021 yıllarında OmniChannel (hem online hem offline alışveriş yapan)
-# olarak yapan müşterilerin geçmiş alışveriş davranışlarından elde edilen bilgilerden oluşmaktadır.
-
+# olarak yapan müşterilerin geçmiş alışveriş davranışlarından elde edilen bilgilerden oluşmaktadır./ The dataset consists of the information obtained from the past shopping behaviors of customers 
+# who made their last purchases from Flo as OmniChannel (both online and offline shopping access) in the years 2020-2021
 # 12 Değişken 19.945 Gözlem 2.7MB
 # Değişkenler / Variables
 #
