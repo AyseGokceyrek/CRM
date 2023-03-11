@@ -117,7 +117,7 @@ df.info()
 # 5. Alışveriş kanallarındaki müşteri sayısının, toplam alınan ürün sayısı ve toplam harcamaların dağılımına bakınız. 
 df.groupby("order_channel").agg({"master_id":"count",
                                  "order_num_total":"sum",
-                                 "customer_value_total":"sum"})
+                                 "customer_value_total":"sum"}) # .sort_values(by="customer_value_total")
 
 # 6. En fazla kazancı getiren ilk 10 müşteriyi sıralayınız.
 df.sort_values("customer_value_total", ascending=False)[:10]
@@ -136,10 +136,15 @@ def data_prep(dataframe):
 ###############################################################
 # GÖREV 2: RFM Metriklerinin Hesaplanması
 ###############################################################
+# Recency(Müşterinin yeniliği, sıcaklığı)(Analizin yapıldığı tarih - ilgili müşterinin son satınalma yaptığı tarih)
+# Frequency(Müşterinin yaptığı toplam satınalma)
+# Monetary(Müşterinin yaptığı toplam satınalmalar neticesinde müşterinin bıraktığı parasal değerdir)
+
 
 # Veri setindeki en son alışverişin yapıldığı tarihten 2 gün sonrasını analiz tarihi
 df["last_order_date"].max() # 2021-05-30
 analysis_date = dt.datetime(2021,6,1)
+type(analysis_date)
 
 
 # customer_id, recency, frequnecy ve monetary değerlerinin yer aldığı yeni bir rfm dataframe
@@ -150,6 +155,16 @@ rfm["frequency"] = df["order_num_total"]
 rfm["monetary"] = df["customer_value_total"]
 
 rfm.head()
+rfm.describe().T
+
+"""
+rfm = {'customerId': df["master_id"],
+       'recency': (today_date - df["last_order_date"]).astype('timedelta64[D]'),
+       'frequency': df["omnichannel_total_order_num"],
+       'monetary': df["omnichannel_total_price_num"]}
+       
+flo_rfm = pd.DataFrame(rfm)
+"""
 
 ###############################################################
 # GÖREV 3: RF ve RFM Skorlarının Hesaplanması (Calculating RF and RFM Scores)
@@ -157,7 +172,8 @@ rfm.head()
 
 #  Recency, Frequency ve Monetary metriklerini qcut yardımı ile 1-5 arasında skorlara çevrilmesi ve
 # Bu skorları recency_score, frequency_score ve monetary_score olarak kaydedilmesi
-rfm["recency_score"] = pd.qcut(rfm['recency'], 5, labels=[5, 4, 3, 2, 1])
+rfm["recency_score"] = pd.qcut(rfm['recency'], 5, labels=[5, 4, 3, 2, 1]) # Küçük gördüğü yere 5 puan, büyük gördüklerine 1 puan
+# 0-100 değerimiz var, qcut bunları küçükten büyüğe sıralar ve 5 parçaya böl dediğimizde = 0-20 = 5, 20-40 =4, 40-60 = 3, 60-80 = 2, 80-100=1
 rfm["frequency_score"] = pd.qcut(rfm['frequency'].rank(method="first"), 5, labels=[1, 2, 3, 4, 5])
 rfm["monetary_score"] = pd.qcut(rfm['monetary'], 5, labels=[1, 2, 3, 4, 5])
 
@@ -168,7 +184,8 @@ rfm.head()
 rfm["RF_SCORE"] = (rfm['recency_score'].astype(str) + rfm['frequency_score'].astype(str))
 import pandas as pd
 
-
+rfm["RF_SCORE"].head()
+rfm.info()
 
 # 3. recency_score ve frequency_score ve monetary_score'u tek bir değişken olarak ifade edilmesi ve RFM_SCORE olarak kaydedilmesi
 rfm["RFM_SCORE"] = (rfm['recency_score'].astype(str) + rfm['frequency_score'].astype(str) + rfm['monetary_score'].astype(str))
