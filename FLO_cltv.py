@@ -150,6 +150,7 @@ cltv_df["monetary_cltv_avg"] = df["customer_value_total"] / df["order_num_total"
 
 cltv_df.head()
 
+# Alternatif yöntem; 
 #Flo_cltv = {'customerId': df["master_id"],
            # 'recency_cltv_weekly': ((df["last_order_date"] - df["first_order_date"]).astype('timedelta64[D]')) / 7,
             #'T_weekly': ((today_date - df["first_order_date"]).astype('timedelta64[D]'))/7,
@@ -206,45 +207,37 @@ cltv_df["exp_sales_6_month"] = bgf.predict(4*6,
                                        cltv_df['T_weekly'])
 
 
+#Modelimiz ve gerçek değerler arasındaki durumu gözlemlemek amacı ile tablo oluşturmakta fayda var.
 
 plot_period_transactions(Flo_bgf)
 plt.show(block=True)
 
-#Modelimiz ve gerçek değerler arasındaki durumu gözlemlemek amacı ile tablo oluşturmakta fayda var.
 
 # Adım 2: Gamma-Gamma modelini fit ediniz. Müşterilerin ortalama bırakacakları değeri tahminleyip exp_average_value olarak cltv
 # dataframe'ine ekleyiniz
 
-Flo_ggf = GammaGammaFitter(penalizer_coef=0.01)
+ggf = GammaGammaFitter(penalizer_coef=0.01)
+ggf.fit(cltv_df['frequency'], cltv_df['monetary_cltv_avg'])
+cltv_df["exp_average_value"] = ggf.conditional_expected_average_profit(cltv_df['frequency'],
+                                                                cltv_df['monetary_cltv_avg'])
+cltv_df.head()
+cltv_df.describe().T
+cltv_df["expected_average_profit"].head(20)
 
-Flo_ggf.fit(Flo_cltv['frequency'].astype(int), Flo_cltv['monetary_cltv_avg'])
-
-Flo_ggf.conditional_expected_average_profit(Flo_cltv['frequency'],
-                                        Flo_cltv['monetary_cltv_avg']).head(10)
-
-Flo_ggf.conditional_expected_average_profit(Flo_cltv['frequency'],
-                                        Flo_cltv['monetary_cltv_avg']).sort_values(ascending=False).head(10)
-
-Flo_cltv["expected_average_profit"] = Flo_ggf.conditional_expected_average_profit(Flo_cltv['frequency'],
-                                                                             Flo_cltv['monetary_cltv_avg'])
-
-
-
-Flo_cltv.describe().T
-Flo_cltv["expected_average_profit"].head(20)
 # Adım 3: 6 aylık CLTV hesaplayınız ve cltv ismiyle dataframe'e ekleyiniz.
 #• Cltv değeri en yüksek 20 kişiyi gözlemleyiniz
 
-Flo_cltv["cltv"] = Flo_ggf.customer_lifetime_value(Flo_bgf,
-                                   Flo_cltv['frequency'],
-                                   Flo_cltv['recency_cltv_weekly'],
-                                   Flo_cltv['T_weekly'],
-                                   Flo_cltv['monetary_cltv_avg'],
+cltv = ggf.customer_lifetime_value(bgf,
+                                   cltv_df['frequency'],
+                                   cltv_df['recency_cltv_weekly'],
+                                   cltv_df['T_weekly'],
+                                   cltv_df['monetary_cltv_avg'],
                                    time=6,  # 6 aylık
-                                   freq="W",  # T'nin frekans bilgisi.
+                                   freq="W", # T'nin frekans bilgisi
                                    discount_rate=0.01)
 
-Flo_cltv.sort_values(by="cltv", ascending=False).head(20)
+
+cltv.sort_values(by="cltv", ascending=False).head(20)
 
 ###############################################################
 # Görev 4: CLTV Değerine Göre Segmentlerin Oluşturulması
