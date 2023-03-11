@@ -65,6 +65,15 @@ df.describe().T
 
 # Aşağıdaki 0.01 ve 0.99 değerleri veri setimizde 10000000 gibi veri setimizi içerisinde olmasını beklemediğimiz değerler olması dahilinde onları baskılıyoruz.
 #Fazla baskılamamak adına da 25 e 75 lik oran aralığı fazla daralttığı için, ucundan bakıp çıkmak adına 0.001 ve 0.99 değerleri seçiliyor
+##Aşağıdaki fonksiyonun görevi kendisine girilen dğişken için eşik değer belirlemektir. Bundan dolayı öncelikle bir eşik
+#değer belirlemek gerekmektedir. Bu işlem için;
+ #-öncelikle çeyrek değerleri(25'lik(1.çyrk) ve 75'lik(3.çyrk) çeyrek değerler) hesaplayacağız
+ #-çeyrek değerlerin farkı hesaplandıktan sonra
+ #-Üst sınır için = Yukarıda elde ettiğimiz fark(interquantile range) 1.55 ile çarpılır ve 3. çeyrek değere eklenir.
+ #-Alt limit için = 1. çeyrek değerden, yukarıda elde ettiğimiz fark(interquantile range) 1.55 ile çarpılarak çıkartılır.
+
+# -Quantile fonksiyonu çeyreklik hesaplamak için kullanılır. Çeyreklik hesaplamak demek; değişkeni küçükten büyüğe sırala,
+#yüzdelik olarak %25. , %50. değerlere karşılık gelenleri bulduğumuzda bunlar değişkenimizin çeyrek değerleridir.
 
 def outlier_thresholds(dataframe, variable):
     quartile1 = dataframe[variable].quantile(0.01)
@@ -74,6 +83,10 @@ def outlier_thresholds(dataframe, variable):
     low_limit = quartile1 - 1.5 * interquantile_range
     return low_limit, up_limit
 
+
+## Aşağıdaki fonksiyonumuzda bir dataframe ile değişken olarak çağırdığımızda bir değişkenin değeri üst eşik değerinden yüksek
+# ise bu değeri üst eşik değeri ile değiştir diyoruz. Aynı şekilde alt eşik değerimizden küçük ise değer onu da alt eşik 
+# değeri ile değiştir diyoruz fonksiyonumuz ile. Yani aykırı değerleri baskılamış oluyoruz. 
 
 def replace_with_thresholds(dataframe, variable):
     low_limit, up_limit = outlier_thresholds(dataframe, variable)
@@ -100,9 +113,15 @@ df["omnichannel_total_price_num"] = df["customer_value_total_ever_offline"] + df
 
 
 # Adım 5: Değişken tiplerini inceleyiniz. Tarih ifade eden değişkenlerin tipini date'e çeviriniz
-for col in df.columns:
-    if "date" in col:
-        df[col] = pd.to_datetime(df[col])
+
+date_columns = df.columns[df.columns.str.contains("date")]
+df[date_columns] = df[date_columns].apply(pd.to_datetime)
+
+
+#for col in df.columns:
+   # if "date" in col:
+       # df[col] = pd.to_datetime(df[col])
+
 df.info()
 df.describe().T
 ###############################################################
@@ -122,45 +141,70 @@ type(today_date)
 # Frequency: tekrar eden toplam satın alma sayısı (frequency>1)(Müşteri en az 2 kez alışveriş yapmış)
 # Monetary: satın alma başına ortalama kazanç (Monetary değerinin ortalaması) (toplam satınalma / toplam işlem !!!!!!!)
 
-Flo_cltv = {'customerId': df["master_id"],
-            'recency_cltv_weekly': ((df["last_order_date"] - df["first_order_date"]).astype('timedelta64[D]')) / 7,
-            'T_weekly': ((today_date - df["first_order_date"]).astype('timedelta64[D]'))/7,
-            'frequency': df["omnichannel_total_order_num"],
-            'monetary_cltv_avg': df["omnichannel_total_price_num"] / df["omnichannel_total_order_num"]}
+cltv_df = pd.DataFrame()
+cltv_df["customer_id"] = df["master_id"]
+cltv_df["recency_cltv_weekly"] = ((df["last_order_date"]- df["first_order_date"]).astype('timedelta64[D]')) / 7
+cltv_df["T_weekly"] = ((analysis_date - df["first_order_date"]).astype('timedelta64[D]'))/7
+cltv_df["frequency"] = df["order_num_total"]
+cltv_df["monetary_cltv_avg"] = df["customer_value_total"] / df["order_num_total"]
 
-Flo_cltv = pd.DataFrame(Flo_cltv)
-type(Flo_cltv[["frequency"]])
+cltv_df.head()
 
-Flo_cltv.head()
+#Flo_cltv = {'customerId': df["master_id"],
+           # 'recency_cltv_weekly': ((df["last_order_date"] - df["first_order_date"]).astype('timedelta64[D]')) / 7,
+            #'T_weekly': ((today_date - df["first_order_date"]).astype('timedelta64[D]'))/7,
+            #'frequency': df["omnichannel_total_order_num"],
+            #'monetary_cltv_avg': df["omnichannel_total_price_num"] / df["omnichannel_total_order_num"]}
+
+#Flo_cltv = pd.DataFrame(Flo_cltv)
+
 ###############################################################
 # GÖREV 3. BG/NBD, Gamma-Gamma Modellerinin Kurulması ve CLTV’nin Hesaplanması
 ###############################################################
 # Adım 1: BG/NBD modelini fit ediniz
-# • 3 ay içerisinde müşterilerden beklenen satın almaları tahmin ediniz ve exp_sales_3_month olarak cltv dataframe'ine ekleyiniz.
-# • 6 ay içerisinde müşterilerden beklenen satın almaları tahmin ediniz ve exp_sales_6_month olarak cltv dataframe'ine ekleyiniz.
 
-Flo_bgf = BetaGeoFitter(penalizer_coef=0.001)  # ceza puanı 0.001 i olabildiğince küçük tutuyoruz. Dataset ten datasete göre değişiklik gösterir
+# BetaGeofitter methodumuz der ki bir model nesnesi oluşturacağım. Bu model nesnesi aracılığı ile sen fit methodunu
+# kullanarak bana recency, frequency ve müşteri yaşı değerlerini verdiğinde sana bu modeli kurmuş olacağım der.
+# Bu modelde gama ve beta dağılımları kullanılmaktadır. Buradaki parametreler bulunurken en çok olabilirlik yönteminden
+# yararlanılıyor. Ve parametre bulma işlemleri sırasında bir argüman giriyoruz.
+# panalizer_coef=0.001 giriliyor. Bu da katsayılara uygulanacak olan ceza katsayısıdır. Detayları makine öğrenmesinde karşımıza gelecek.
+
+
+bgf = BetaGeoFitter(penalizer_coef=0.001)  # ceza puanı 0.001 i olabildiğince küçük tutuyoruz. Dataset ten datasete göre değişiklik gösterir
 # bu penalizer coef değeri 0.001 ile 0.1 arasında değişiklik olarak gösterilebilir. Fit etmek modeli hazır hale getirmektir.
 
-Flo_bgf.fit(Flo_cltv['frequency'],
-        Flo_cltv['recency_cltv_weekly'],
-        Flo_cltv['T_weekly'])
 
-Flo_cltv["exp_sales_3_month"] = Flo_bgf.predict(4*3,
-                                                Flo_cltv['frequency'],
-                                                Flo_cltv['recency_cltv_weekly'],
-                                               Flo_cltv['T_weekly']).sort_values(ascending=False)
+bgf.fit(cltv_df['frequency'],
+        cltv_df['recency_cltv_weekly'],
+        cltv_df['T_weekly']
+        )
 
-Flo_cltv.head(20)
+
+# 3 ay içerisinde müşterilerden beklenen satın almaları tahmin ediniz ve exp_sales_3_month olarak cltv dataframe'ine ekleyiniz.
+# predict fonksiyonu BGNBG modeli için geçerli olup GamaGama modeli için geçerli değildir.
+cltv_df["exp_sales_3_month"] = bgf.predict(4*3,
+                                       cltv_df['frequency'],
+                                       cltv_df['recency_cltv_weekly'],
+                                       cltv_df['T_weekly']) # sıralı görtermek istersek sort_values(ascending=False) ekliyoruz.
+
+
+
+cltv_df.head(20)
 # Expected olanlar birim üzerinden
-Flo_cltv["exp_sales_3_month"].describe().T
+cltv_df["exp_sales_3_month"].describe().T
 
-Flo_cltv["exp_sales_6_month"] = Flo_bgf.predict(4*6,
-                                                Flo_cltv['frequency'],
-                                                Flo_cltv['recency_cltv_weekly'],
-                                                Flo_cltv['T_weekly'])
-Flo_cltv.describe().T
-Flo_cltv.columns
+# 3 aylık periyotta şirketimizin beklediği satış sayısına erişmek istersek;
+bgf.predict(4*3,
+            cltv_df['frequency'],
+            cltv_df['recency_cltv_weekly'],
+            cltv_df['T_weekly']).sum()
+
+# 6 ay içerisinde müşterilerden beklenen satın almaları tahmin ediniz ve exp_sales_6_month olarak cltv dataframe'ine ekleyiniz.
+cltv_df["exp_sales_6_month"] = bgf.predict(4*6,
+                                       cltv_df['frequency'],
+                                       cltv_df['recency_cltv_weekly'],
+                                       cltv_df['T_weekly'])
+
 
 
 plot_period_transactions(Flo_bgf)
