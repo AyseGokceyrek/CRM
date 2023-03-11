@@ -236,6 +236,7 @@ cltv = ggf.customer_lifetime_value(bgf,
                                    freq="W", # T'nin frekans bilgisi
                                    discount_rate=0.01)
 
+cltv_df["cltv"] = cltv
 
 cltv.sort_values(by="cltv", ascending=False).head(20)
 
@@ -244,21 +245,23 @@ cltv.sort_values(by="cltv", ascending=False).head(20)
 ###############################################################
 # Adım 1: 6 aylık CLTV'ye göre tüm müşterilerinizi 4 gruba (segmente) ayırınız ve grup isimlerini veri setine ekleyiniz.
 
-Flo_cltv["cltv_segment"] = pd.qcut(Flo_cltv["cltv"], 4, labels=["D", "C", "B", "A"])
-Flo_cltv.head()
+cltv_df["cltv_segment"] = pd.qcut(cltv_df["cltv"], 4, labels=["D", "C", "B", "A"]) # Küçük gördüğü yere D, büyük gördüklerine A
+cltv_df.head()
 
-Flo_cltv.groupby("cltv_segment").agg(["min", "max", "mean", "count"])
+cltv_df.groupby("cltv_segment").agg(["min", "max", "mean", "count"])
+cltv_df.groupby("cltv_segment").agg({"exp_sales_3_month": ["min", "max", "mean", "count"]})
+
 
 # Adım 2: 4 grup içerisinden seçeceğiniz 2 grup için yönetime kısa kısa 6 aylık aksiyon önerilerinde bulununuz.
 
-Flo_cltv.groupby("cltv_segment").agg({"cltv": ["mean", "min", "max"]})
+cltv_df.groupby("cltv_segment").agg({"cltv": ["mean", "min", "max"]})
 
-A_segments = Flo_cltv.loc[Flo_cltv["cltv_segment"] == "A"]sort_values(by="cltv" ,ascending=False)
-B_segments = Flo_cltv.loc[Flo_cltv["cltv_segment"] == "B"].sort_values(by="cltv", ascending=False)
+A_segments = cltv_df.loc[cltv_df["cltv_segment"] == "A"].sort_values(by="cltv" ,ascending=False)
+B_segments = cltv_df.loc[cltv_df["cltv_segment"] == "B"].sort_values(by="cltv", ascending=False)
 
 # Müşteri edinme maliyetlerini azaltmak adına üst segmentler olan A ve B segmentlerine odaklanarak A ve B segmentlerine özel
 #ürün grupları oluşturulabilir.
 
 
 
-Flo_cltv.to_csv("Flo_cltv_prediction.csv")
+cltv_df.to_csv("Flo_cltv_prediction.csv")
