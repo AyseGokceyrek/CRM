@@ -211,8 +211,24 @@ seg_map = {
 }
 
 rfm['segment'] = rfm['RF_SCORE'].replace(seg_map, regex=True)
+"""
+Bu kod, RFM analizindeki müşteri segmentasyonunu belirlemek için kullanılan bir segmentasyon haritasını oluşturur. 
+Segmentasyon haritası, RFM puanlarını kullanarak müşterileri farklı segmentlere ayırmaya yardımcı olan bir tablodur.
 
+seg_map sözlüğü, RFM puanlarına dayalı olarak müşterileri farklı segmentlere ayırmak için kullanılan regex ifadelerini içerir. 
+Bu ifadeler, belirli puan aralıklarını tanımlar ve bu aralıklara ait müşterileri belirli bir segmente atar.
+
+replace yöntemi, RF_SCORE sütunundaki her bir değer için seg_map sözlüğündeki regex ifadelerine göre bir eşleşme arar ve 
+eşleşen anahtarın değerini kullanarak segment sütununu oluşturur. Bu nedenle, regex=True ifadesi, replace yöntemini kullanırken 
+seg_map sözlüğündeki anahtarların regex ifadelerine göre eşleştirilmesini sağlar.
+
+Örneğin, r'[1-2][1-2]' ifadesi, RF_SCORE sütunundaki değerlerin ilk iki hanesinde "1" veya "2" olan müşterileri "hibernating" segmentine atar. 
+r'33' ifadesi, RFM puanı "333" olan müşterileri "need_attention" segmentine atar.
+
+Bu yöntem, müşterileri farklı segmentlere atamak için esnek bir yaklaşım sunar ve işletmelerin belirli pazarlama stratejileri geliştirmelerine yardımcı olabilir.
+"""
 rfm.head()
+
 
 ###############################################################
 # GÖREV 5: Aksiyon zamanı!
