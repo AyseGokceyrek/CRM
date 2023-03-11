@@ -244,13 +244,17 @@ rfm[["segment", "recency", "frequency", "monetary"]].groupby("segment").agg(["me
 # at_Risk              241.61  3131      4.47  3131   646.61  3131
 # cant_loose           235.44  1200     10.70  1200  1474.47  1200
 # champions             17.11  1932      8.93  1932  1406.63  1932
-# hibernating          247.95  3604      2.39  3604   366.27  3604
+# hibernating (uykuda) 247.95  3604      2.39  3604   366.27  3604
 # loyal_customers       82.59  3361      8.37  3361  1216.82  3361
 # need_attention       113.83   823      3.73   823   562.14   823
 # new_customers         17.92   680      2.00   680   339.96   680
 # potential_loyalists   37.16  2938      3.30  2938   533.18  2938
 # promising             58.92   647      2.00   647   335.67   647
 
+# BONUS: Müşteri segmentlerimi yüzdelik dilimler halinde görmek için;
+segment_percentiles = rfm['segment'].value_counts(normalize=True).mul(100).reset_index()
+segment_percentiles.columns = ['segment', 'percentile']
+segment_percentiles['cumulative_percent'] = segment_percentiles['percentile'].cumsum()
 
 # 2. RFM analizi yardımı ile 2 case için ilgili profildeki müşterileri bulunuz ve müşteri id'lerini csv ye kaydediniz.
 
