@@ -208,7 +208,7 @@ cltv_df["exp_sales_6_month"] = bgf.predict(4*6,
 
 #Modelimiz ve gerçek değerler arasındaki durumu gözlemlemek amacı ile tablo oluşturmakta fayda var.
 
-plot_period_transactions(Flo_bgf)
+plot_period_transactions(cltv_df)
 plt.show(block=True)
 
 
