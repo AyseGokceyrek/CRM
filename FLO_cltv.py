@@ -166,8 +166,7 @@ cltv_df.head()
 
 # BetaGeofitter methodumuz der ki bir model nesnesi oluşturacağım. Bu model nesnesi aracılığı ile sen fit methodunu
 # kullanarak bana recency, frequency ve müşteri yaşı değerlerini verdiğinde sana bu modeli kurmuş olacağım der.
-# Bu modelde gama ve beta dağılımları kullanılmaktadır. Buradaki parametreler bulunurken en çok olabilirlik yönteminden
-# yararlanılıyor. Ve parametre bulma işlemleri sırasında bir argüman giriyoruz.
+# Ve parametre bulma işlemleri sırasında bir argüman giriyoruz.
 # panalizer_coef=0.001 giriliyor. Bu da katsayılara uygulanacak olan ceza katsayısıdır. Detayları makine öğrenmesinde karşımıza gelecek.
 
 
