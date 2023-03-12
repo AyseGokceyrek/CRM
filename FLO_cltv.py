@@ -221,7 +221,7 @@ cltv_df["exp_average_value"] = ggf.conditional_expected_average_profit(cltv_df['
                                                                 cltv_df['monetary_cltv_avg'])
 cltv_df.head()
 cltv_df.describe().T
-cltv_df["expected_average_profit"].head(20)
+# cltv_df["expected_average_profit"].head(20)
 
 # Adım 3: 6 aylık CLTV hesaplayınız ve cltv ismiyle dataframe'e ekleyiniz.
 #• Cltv değeri en yüksek 20 kişiyi gözlemleyiniz
