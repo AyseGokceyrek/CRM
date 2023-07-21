@@ -1,6 +1,3 @@
 # RFM - CLTV
-In this project, a CRM analysis was made by examining the data of a shoe brand.
-In this context, BG/NBG Model and Gamma Gamma Model were created. 
-With our BG/NBG Model, customer purchase numbers were estimated.
-With the Gamma Gamma Model, the expected average profit were calculated.
+In the project, I utilized RFM analysis, the BG/NBD model, and the Gamma-Gamma model for sales forecasting and profit prediction for a retail shoe brand named Flo. RFM analysis helped in customer segmentation based on recency, frequency, and monetary value, while the BG/NBD model predicted future sales based on historical purchase data and customer lifetimes. The Gamma-Gamma model was employed to estimate customer lifetime value and aid in profit prediction. By combining these analytical techniques, the project aimed to optimize business operations, enhance customer satisfaction, and make data-driven decisions in the retail shoe market
 
